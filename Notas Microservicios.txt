@@ -15,7 +15,7 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 5.0.8
 
 dotnet build
 
-
+docker build -t ahernandezcarrillo/platformservice .
 
 
 

@@ -32,32 +32,32 @@ namespace PlatformService.Controllers
             return Ok(_mapper.Map<IEnumerable<PlatformReadDto>>(PlatformItems));
         }
 
-        ////GET api/Platforms/5
-        //[HttpGet("{id}", Name = "GetPlatformById")]
-        //public ActionResult<PlatformReadDto> GetPlatformById(int id)
-        //{
-        //    var PlatformItem = _repository.GetPlatformById(id);
-        //    if (PlatformItem != null)
-        //    {
-        //        return Ok(_mapper.Map<PlatformReadDto>(PlatformItem));
-        //    }
-        //    return NotFound();
-        //}
+        //GET api/Platforms/5
+        [HttpGet("{id}", Name = "GetPlatformById")]
+        public ActionResult<PlatformReadDto> GetPlatformById(int id)
+        {
+            var PlatformItem = _repository.GetPlatformById(id);
+            if (PlatformItem != null)
+            {
+                return Ok(_mapper.Map<PlatformReadDto>(PlatformItem));
+            }
+            return NotFound();
+        }
 
-        ////POST api/Platforms
-        //[HttpPost]
-        //public ActionResult<PlatformReadDto> CreatePlatform(PlatformCreateDto PlatformCreateDto)
-        //{
-        //    var PlatformModel = _mapper.Map<Platform>(PlatformCreateDto);
-        //    _repository.CreatePlatform(PlatformModel);
-        //    _repository.SaveChanges();
+        //POST api/Platforms
+        [HttpPost]
+        public ActionResult<PlatformReadDto> CreatePlatform(PlatformCreateDto PlatformCreateDto)
+        {
+            var PlatformModel = _mapper.Map<Platform>(PlatformCreateDto);
+            _repository.CreatePlatform(PlatformModel);
+            _repository.SaveChanges();
 
-        //    var PlatformReadDto = _mapper.Map<PlatformReadDto>(PlatformModel);
+            var PlatformReadDto = _mapper.Map<PlatformReadDto>(PlatformModel);
 
-        //    // Esta es la forma correcta de regresar el estatus 201 Created
-        //    return CreatedAtRoute(nameof(GetPlatformById), new { id = PlatformReadDto.Id }, PlatformReadDto);
-        //    //return Ok(PlatformModel);
-        //}
+            // Esta es la forma correcta de regresar el estatus 201 Created
+            return CreatedAtRoute(nameof(GetPlatformById), new { id = PlatformReadDto.Id }, PlatformReadDto);
+            //return Ok(PlatformModel);
+        }
 
         //// PUT api/Platforms/id
         //[HttpPut("id")]
