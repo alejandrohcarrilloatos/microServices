@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Commander.Controllers
 {
-    [Route("api/commands")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CommandsController : ControllerBase
     {

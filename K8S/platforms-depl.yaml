@@ -15,3 +15,17 @@ spec:
       containers:
         - name: platformservice
           image: ahernandezcarrillo/platformservice:latest
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: platform-clusterip-srv
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: platformservice
+#   ports: 
+#     - name : platformnpservice
+#       protocol: TCP
+#       port: 80
+#       targetPort: 80

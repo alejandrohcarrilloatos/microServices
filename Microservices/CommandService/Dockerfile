@@ -7,19 +7,19 @@
 #
 #FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 #WORKDIR /src
-#COPY ["PlatformService/PlatformService.csproj", "PlatformService/"]
-#RUN dotnet restore "PlatformService/PlatformService.csproj"
+#COPY ["Commander/CommandService.csproj", "Commander/"]
+#RUN dotnet restore "Commander/CommandService.csproj"
 #COPY . .
-#WORKDIR "/src/PlatformService"
-#RUN dotnet build "PlatformService.csproj" -c Release -o /app/build
+#WORKDIR "/src/Commander"
+#RUN dotnet build "CommandService.csproj" -c Release -o /app/build
 #
 #FROM build AS publish
-#RUN dotnet publish "PlatformService.csproj" -c Release -o /app/publish
+#RUN dotnet publish "CommandService.csproj" -c Release -o /app/publish
 #
 #FROM base AS final
 #WORKDIR /app
 #COPY --from=publish /app/publish .
-#ENTRYPOINT ["dotnet", "PlatformService.dll"]
+#ENTRYPOINT ["dotnet", "CommandService.dll"]
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
@@ -33,4 +33,4 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "PlatformService.dll"]
+ENTRYPOINT ["dotnet", "CommandService.dll"]

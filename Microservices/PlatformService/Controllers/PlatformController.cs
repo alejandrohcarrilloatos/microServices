@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformService.Data;
 using PlatformService.Dtos;
 using PlatformService.Models;
+using PlatformService.SyncDataServices.Http;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PlatformService.Controllers
 
@@ -15,13 +17,14 @@ namespace PlatformService.Controllers
     {
         private readonly IPlatformRepo _repository;
         private readonly IMapper _mapper;
+        private readonly ICommandDataClient _commandDataClient;
 
-        public PlatformsController(IPlatformRepo repository, IMapper mapper)
+        public PlatformsController(IPlatformRepo repository, IMapper mapper, ICommandDataClient commandDataClient)
         {
             _repository = repository;
             _mapper = mapper;
+            _commandDataClient = commandDataClient;
         }
-
 
         //GET api/Platforms
         [HttpGet]
@@ -46,7 +49,7 @@ namespace PlatformService.Controllers
 
         //POST api/Platforms
         [HttpPost]
-        public ActionResult<PlatformReadDto> CreatePlatform(PlatformCreateDto PlatformCreateDto)
+        public async Task<ActionResult<PlatformReadDto>> CreatePlatform(PlatformCreateDto PlatformCreateDto)
         {
             var PlatformModel = _mapper.Map<Platform>(PlatformCreateDto);
             _repository.CreatePlatform(PlatformModel);
@@ -54,6 +57,14 @@ namespace PlatformService.Controllers
 
             var PlatformReadDto = _mapper.Map<PlatformReadDto>(PlatformModel);
 
+            try
+            {
+                await _commandDataClient.SendPlatformToCommand(PlatformReadDto);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"--> No se pudo enviar el mesaje asincrono: { ex.Message }");
+            }
             // Esta es la forma correcta de regresar el estatus 201 Created
             return CreatedAtRoute(nameof(GetPlatformById), new { id = PlatformReadDto.Id }, PlatformReadDto);
             //return Ok(PlatformModel);

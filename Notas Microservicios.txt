@@ -20,10 +20,17 @@ DOCKERS
 
 https://www.docker.com/sites/default/files/d8/2019-09/docker-cheat-sheet.pdf
 
+*** Dentro del directorio del proyecto 
+
 docker build -t ahernandezcarrillo/platformservice .
+docker build -t ahernandezcarrillo/commandservice .
+
+docker push ahernandezcarrillo/platformservice
+docker push ahernandezcarrillo/commandservice
 
 
-docker run -p 8080:80 -d ahernandezcarrillo/platformservice 
+docker run -p 8080:80 -d --name platformservice ahernandezcarrillo/platformservice 
+docker run -p 8080:80 -d --name commandservice ahernandezcarrillo/commandservice
 
 KUBERNETES
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
@@ -40,8 +47,9 @@ kubectl apply -f platforms-depl.yaml
 kubectl get deployments
 kubectl get pods
 
-kube delete deployment platforms-depl
+kubectl delete deployment platforms-depl
 
+kubectl rollout restart deployment platforms-depl
 
 
 
