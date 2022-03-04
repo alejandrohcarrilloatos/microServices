@@ -21,6 +21,7 @@ namespace Commander
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseSetting("https_port", "6001");
                 });
     }
 }

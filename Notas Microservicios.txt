@@ -29,8 +29,8 @@ docker push ahernandezcarrillo/platformservice
 docker push ahernandezcarrillo/commandservice
 
 
-docker run -p 8080:80 -d --name platformservice ahernandezcarrillo/platformservice 
-docker run -p 8080:80 -d --name commandservice ahernandezcarrillo/commandservice
+docker run -p 8081:80 -d --name dkrplatfrmsrvc ahernandezcarrillo/platformservice 
+docker run -p 8082:80 -d --name dkrcmdservice ahernandezcarrillo/commandservice
 
 KUBERNETES
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
@@ -42,20 +42,75 @@ kubectl get deployment my-dep                 # List a particular deployment
 kubectl get pods                              # List all pods in the namespace
 kubectl get pod my-pod -o yaml                # Get a pod's YAML
 
+
+
 kubectl apply -f platforms-depl.yaml
+
+kubectl apply -f platforms-np-srv.yaml
+
+kubectl apply -f commands-depl.yaml
+
+kubectl apply -f ingress-srv.yaml
+
+kubectl apply -f local-pvc.yaml
+
 
 kubectl get deployments
 kubectl get pods
 
 kubectl delete deployment platforms-depl
+kubectl delete deployment ingress-srv
 
+/** Reinicia o refresca un deployment **/
 kubectl rollout restart deployment platforms-depl
 
+/*********************************
+SOLUCION AL PROBLEMA para enviar el mesaje SINCRONO. 
+The SSL connection could not be established, see inner exception.
+The remote certificate is invalid because of errors in the certificate chain: UntrustedRoot
+
+1) ByPass los cetificados al instanciar el httpClient
+
+	HttpClientHandler clientHandler = new HttpClientHandler();
+        clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+        // Pass the handler to httpclient(from you are calling api)
+        HttpClient client = new HttpClient(clientHandler);
+
+Esta solucion funciono, pero se evitaba la injeccion de dependencias.
+
+2) Instalar el certificado para localhost
+
+	dotnet dev-certs https --trust
+
+**********************************/
+
+dotnet dev-certs https --trust
 
 
 
 
+c:\repos\Atos\Ej05MicroServices\Microservices\PlatformService>kubectl get services
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes              ClusterIP   10.96.0.1      <none>        443/TCP        15d
+platformnpservice-srv   NodePort    10.104.241.7   <none>        80:30192/TCP   32s
 
+//** Check NGINX instalation
+kubectl get namespace
+kubectl get pods --namespace=ingress-nginx
+
+
+https://kubernetes.github.io/ingress-nginx/deploy/
+                 https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
+Instalas NGINX
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
+
+
+kubectl get storageclass
+
+kubectl get pvc
+
+//** Crear el password para el SQL 
+kubectl create secret generic mssql --from-literal=SA_PASSWORD="Admin4dm1n!"
 
 
 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace PlatformService.Controllers
 
 {
-    [Route("api/platforms")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PlatformsController : ControllerBase
     {
@@ -19,7 +19,10 @@ namespace PlatformService.Controllers
         private readonly IMapper _mapper;
         private readonly ICommandDataClient _commandDataClient;
 
-        public PlatformsController(IPlatformRepo repository, IMapper mapper, ICommandDataClient commandDataClient)
+        public PlatformsController(
+            IPlatformRepo repository, 
+            IMapper mapper, 
+            ICommandDataClient commandDataClient)
         {
             _repository = repository;
             _mapper = mapper;
@@ -63,7 +66,7 @@ namespace PlatformService.Controllers
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"--> No se pudo enviar el mesaje asincrono: { ex.Message }");
+                Console.WriteLine($"--> No se pudo enviar el mesaje SINCRONO: { ex.Message } \n { ex.InnerException.Message }" );
             }
             // Esta es la forma correcta de regresar el estatus 201 Created
             return CreatedAtRoute(nameof(GetPlatformById), new { id = PlatformReadDto.Id }, PlatformReadDto);

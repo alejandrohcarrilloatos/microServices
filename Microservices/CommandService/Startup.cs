@@ -1,5 +1,6 @@
 using AutoMapper;
 using Commander.Data;
+using CommandService.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,8 @@ namespace Commander
             // Registramos la injeccion de dependencias, existen 3 tipos Singleton, Scoped y Transient
             services.AddScoped<ICommanderRepo, SqlCommanderRepo>();
 
+            services.AddHttpsRedirection( options => options.HttpsPort = 6001 );
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Commander", Version = "v1" });
@@ -55,7 +58,7 @@ namespace Commander
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Commander v1"));
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -65,6 +68,8 @@ namespace Commander
             {
                 endpoints.MapControllers();
             });
+
+            PrepDb.PrepPopulation(app);
         }
     }
 }
