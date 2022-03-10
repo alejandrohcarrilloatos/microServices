@@ -28,6 +28,10 @@ docker build -t ahernandezcarrillo/commandservice .
 docker push ahernandezcarrillo/platformservice
 docker push ahernandezcarrillo/commandservice
 
+docker login 
+Username: ahernandezcarrillo
+Password: Fr4nc1~A$g
+
 
 docker run -p 8081:80 -d --name dkrplatfrmsrvc ahernandezcarrillo/platformservice 
 docker run -p 8082:80 -d --name dkrcmdservice ahernandezcarrillo/commandservice
@@ -53,6 +57,8 @@ kubectl apply -f commands-depl.yaml
 kubectl apply -f ingress-srv.yaml
 
 kubectl apply -f local-pvc.yaml
+
+kubectl apply -f commands-np-srv.yaml
 
 
 kubectl get deployments
@@ -111,6 +117,8 @@ kubectl get pvc
 
 //** Crear el password para el SQL 
 kubectl create secret generic mssql --from-literal=SA_PASSWORD="Admin4dm1n!"
+
+localhost,1433
 
 
 

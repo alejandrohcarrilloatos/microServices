@@ -15,19 +15,34 @@ namespace Commander
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment _env { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
-
-        public IConfiguration Configuration { get; }
-
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Configuramos el contexto
-            services.AddDbContext<CommanderContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("CommanderConnection")));
+            //*** Para crear la migracion hay que forzar el uso del EF asi que comentamos la condicion de IsProduction
+            string strCnn = Configuration.GetConnectionString("CommanderConnection");
+
+            if (_env.IsProduction())
+            {
+                Console.WriteLine($"-->Usando base de datos SQL strCnn= {strCnn}");
+                services.AddDbContext<CommanderContext>(opt =>
+                    opt.UseSqlServer(strCnn));
+            }
+            else
+            {
+                Console.WriteLine($"-->Usando base de datos en de desarrollo strCnn= {strCnn}");
+                // Configuramos el contexto
+                services.AddDbContext<CommanderContext>(opt => opt.UseSqlServer(strCnn));
+            }
+
 
             services.AddControllers().
                 AddNewtonsoftJson( s => {
@@ -69,7 +84,7 @@ namespace Commander
                 endpoints.MapControllers();
             });
 
-            PrepDb.PrepPopulation(app);
+            PrepDb.PrepPopulation(app, _env.IsProduction());
         }
     }
 }

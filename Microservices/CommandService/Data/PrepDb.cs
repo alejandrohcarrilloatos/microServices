@@ -4,22 +4,33 @@ using Commander.Models;
 using System;
 using System.Linq;
 using Commander.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommandService.Data
 {
     public static class PrepDb
     {
-        public static void PrepPopulation(IApplicationBuilder app)
+        public static void PrepPopulation(IApplicationBuilder app, bool isProd)
         {
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
-                SeedData(serviceScope.ServiceProvider.GetService<CommanderContext>());
+                SeedData(serviceScope.ServiceProvider.GetService<CommanderContext>(), isProd);
             }
 
         }
 
-        private static void SeedData(CommanderContext context)
+        private static void SeedData(CommanderContext context, bool isProd)
         {
+            //Si estamos en produccion con EF aplicamos la migraciones
+            //if (isProd) {
+                Console.WriteLine("---> Aplicando Migraciones EF...");
+                try {
+                    context.Database.Migrate();
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"Could Not run migrations {ex.Message}");
+                }
+            //}
             if (!context.Commands.Any())
             {
                 Console.WriteLine("-----> Sembrando datos de prueba ...");
