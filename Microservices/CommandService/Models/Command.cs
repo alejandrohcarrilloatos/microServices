@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Commander.Models
+namespace CommandService.Models
 {
     public class Command
     {
@@ -13,10 +13,11 @@ namespace Commander.Models
         
         [Required]
         [MaxLength(100)]
-        public string Line { get; set; }
-        
+        public string Commandline { get; set; }
+
         [Required]
-        [MaxLength(50)]
-        public string Platform { get; set; }
+        public int PlatformId { get; set; }
+
+        public Platform Platform { get; set; }
     }
 }

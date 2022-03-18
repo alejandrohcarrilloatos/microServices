@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Commander.Dtos
+namespace CommandService.Dtos
 {
     public class CommandUpdateDto
     {

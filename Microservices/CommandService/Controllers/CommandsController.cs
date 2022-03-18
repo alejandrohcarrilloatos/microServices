@@ -1,21 +1,22 @@
 ﻿using AutoMapper;
-using Commander.Data;
-using Commander.Dtos;
-using Commander.Models;
+using CommandService.Data;
+using CommandService.Dtos;
+using CommandService.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
-namespace Commander.Controllers
+namespace CommandService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/c/platforms/{platformId}/[controller]")]
     [ApiController]
     public class CommandsController : ControllerBase
     {
-        private readonly ICommanderRepo _repository;
+        private readonly ICommandRepo _repository;
         private readonly IMapper _mapper;
 
-        public CommandsController(ICommanderRepo repository, IMapper mapper)
+        public CommandsController(ICommandRepo repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
@@ -23,37 +24,58 @@ namespace Commander.Controllers
 
         //private readonly MockCommanderRepo _repository =  new MockCommanderRepo();
 
-        //GET api/commands
+        //GET api/c/platforms/{platformId}/commands
         [HttpGet]
-        public ActionResult<IEnumerable<CommandReadDto>> GetAllCommands()
+        public ActionResult<IEnumerable<CommandReadDto>> GetCommandsFormPlatform(int platformId)
         {
-            var commandItems = _repository.GetAllCommands();
+            Console.WriteLine($"--> Getting Commands from the Platform: {platformId}");
+
+            if (!_repository.PlatformExists(platformId))
+            {
+                return NotFound();
+            }
+
+            var commandItems = _repository.GetCommandsForPlatform(platformId);
             return Ok(_mapper.Map<IEnumerable<CommandReadDto>>(commandItems));
         }
 
         //GET api/commands/5
-        [HttpGet("{id}", Name = "GetCommandById")]
-        public ActionResult<CommandReadDto> GetCommandById(int id)
+        [HttpGet("{commandId}", Name = "GetCommandForPlatform")]
+        public ActionResult<CommandReadDto> GetCommandForPlatform(int platformId, int commandId)
         {
-            var commandItem = _repository.GetCommandById(id);
+            Console.WriteLine($"--> Getting Command from the Platform: {platformId} / {commandId}");
+            if (!_repository.PlatformExists(platformId))
+            {
+                return NotFound();
+            }
+
+            var commandItem = _repository.GetCommandForPlatform(platformId, commandId);
+
             if (commandItem != null) {
                 return Ok(_mapper.Map<CommandReadDto>(commandItem));
             }
             return NotFound();
         }
 
-        //POST api/commands
+        //POST "api/c/platforms/{platformId}/commands
         [HttpPost]
-        public ActionResult<CommandReadDto> CreateCommand(CommandCreateDto commandCreateDto)
+        public ActionResult<CommandReadDto> CreateCommandForPlatform(int platformId, CommandCreateDto commandCreateDto)
         {
+            Console.WriteLine($"--> CREATING Command from the Platform: {platformId} ");
+            if (!_repository.PlatformExists(platformId))
+            {
+                return NotFound();
+            }
+            Console.WriteLine($"Command TO CreateDto: ${commandCreateDto}");
             var commandModel = _mapper.Map<Command>(commandCreateDto);
-            _repository.CreateCommand(commandModel);
+            _repository.CreateCommand(platformId, commandModel);
             _repository.SaveChanges();
-
+            
             var commandReadDto = _mapper.Map<CommandReadDto>(commandModel);
-
+            
             // Esta es la forma correcta de regresar el estatus 201 Created
-            return CreatedAtRoute(nameof(GetCommandById), new { id = commandReadDto.Id }, commandReadDto);
+            return CreatedAtRoute(nameof(GetCommandForPlatform), 
+                new {platformId = platformId, commandId = commandReadDto.Id }, commandReadDto);
             //return Ok(commandModel);
         }
 
@@ -68,7 +90,7 @@ namespace Commander.Controllers
             }
             _mapper.Map(commandUpdateDto, commandModelFromRepo);
             
-            _repository.UpdateCommand(commandModelFromRepo);
+            _repository.UpdateCommand(1, commandModelFromRepo);
 
             _repository.SaveChanges();
             
@@ -93,7 +115,7 @@ namespace Commander.Controllers
 
             _mapper.Map(commandToPatch, commandModelFromRepo);
 
-            _repository.UpdateCommand(commandModelFromRepo);
+            _repository.UpdateCommand(1, commandModelFromRepo);
 
             _repository.SaveChanges();
 

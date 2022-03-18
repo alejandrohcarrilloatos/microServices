@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
-using Commander.Dtos;
-using Commander.Models;
+using CommandService.Dtos;
+using CommandService.Models;
 
-namespace Commander.Profiles
+namespace CommandService.Profiles
 {
     public class CommandsProfile : Profile
     {
         public CommandsProfile()
         {
+            // Source -> Target
+            CreateMap<Platform, PlatformReadDto>();
+
             // Source to Read DTO
             CreateMap<Command, CommandReadDto>();
 

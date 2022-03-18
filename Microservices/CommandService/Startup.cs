@@ -1,6 +1,7 @@
 using AutoMapper;
-using Commander.Data;
 using CommandService.Data;
+using Newtonsoft.Json.Serialization;
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
-using System;
+//using PlatformService.SyncDataServices.Http;
 
-namespace Commander
+namespace CommandService
 {
     public class Startup
     {
@@ -24,7 +24,6 @@ namespace Commander
             _env = env;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             //*** Para crear la migracion hay que forzar el uso del EF asi que comentamos la condicion de IsProduction
@@ -33,14 +32,14 @@ namespace Commander
             if (_env.IsProduction())
             {
                 Console.WriteLine($"-->Usando base de datos SQL strCnn= {strCnn}");
-                services.AddDbContext<CommanderContext>(opt =>
-                    opt.UseSqlServer(strCnn));
+                services.AddDbContext<AppDBContext>(opt => opt.UseSqlServer(strCnn));
             }
             else
             {
                 Console.WriteLine($"-->Usando base de datos en de desarrollo strCnn= {strCnn}");
                 // Configuramos el contexto
-                services.AddDbContext<CommanderContext>(opt => opt.UseSqlServer(strCnn));
+                services.AddDbContext<AppDBContext>(opt => opt.UseInMemoryDatabase("InMem"));
+
             }
 
 
@@ -53,7 +52,7 @@ namespace Commander
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Registramos la injeccion de dependencias, existen 3 tipos Singleton, Scoped y Transient
-            services.AddScoped<ICommanderRepo, SqlCommanderRepo>();
+            services.AddScoped<ICommandRepo, CommandRepo>();
 
             services.AddHttpsRedirection( options => options.HttpsPort = 6001 );
 
@@ -63,7 +62,6 @@ namespace Commander
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
