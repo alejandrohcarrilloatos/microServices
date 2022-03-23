@@ -92,6 +92,11 @@ namespace CommandService.Data
             return _context.Platforms.Any(p => p.Id == platformId);
         }
 
+         public bool ExternalPlatformExists(int externalPlatformId)
+        {
+            return _context.Platforms.Any(p => p.ExternalId == externalPlatformId);
+        }
+
         public void UpdateCommand(Command cmd)
         {
             //Nothing

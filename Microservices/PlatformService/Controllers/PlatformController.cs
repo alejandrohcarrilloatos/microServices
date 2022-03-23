@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using PlatformService.AsyncDataServices;
 using PlatformService.Data;
 using PlatformService.Dtos;
 using PlatformService.Models;
@@ -18,15 +19,18 @@ namespace PlatformService.Controllers
         private readonly IPlatformRepo _repository;
         private readonly IMapper _mapper;
         private readonly ICommandDataClient _commandDataClient;
+        private readonly IMessageBusClient _messageBusClient;
 
         public PlatformsController(
             IPlatformRepo repository, 
             IMapper mapper, 
-            ICommandDataClient commandDataClient)
+            ICommandDataClient commandDataClient,
+            IMessageBusClient messageBusClient)
         {
             _repository = repository;
             _mapper = mapper;
             _commandDataClient = commandDataClient;
+            _messageBusClient = messageBusClient;
         }
 
         //GET api/Platforms
@@ -60,6 +64,7 @@ namespace PlatformService.Controllers
 
             var PlatformReadDto = _mapper.Map<PlatformReadDto>(PlatformModel);
 
+            // Send Sync Message
             try
             {
                 await _commandDataClient.SendPlatformToCommand(PlatformReadDto);
@@ -68,6 +73,18 @@ namespace PlatformService.Controllers
             {
                 Console.WriteLine($"--> No se pudo enviar el mesaje SINCRONO: { ex.Message } \n { ex.InnerException.Message }" );
             }
+            // Send Async Message
+            try
+            {
+                var platformPublishedDto = _mapper.Map<PlatformPublishedDto>(PlatformReadDto);
+                platformPublishedDto.Event = "Platform_Published";
+                _messageBusClient.PublishNewPlatform(platformPublishedDto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> No se pudo enviar el mesaje ASINCRONO: { ex.Message } \n { ex.InnerException.Message }");
+            }
+
             // Esta es la forma correcta de regresar el estatus 201 Created
             return CreatedAtRoute(nameof(GetPlatformById), new { id = PlatformReadDto.Id }, PlatformReadDto);
             //return Ok(PlatformModel);

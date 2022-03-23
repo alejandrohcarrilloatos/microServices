@@ -14,6 +14,8 @@ namespace PlatformService.Profiles
             // Create DTO to Source
             CreateMap<PlatformCreateDto, Platform>();
 
+            CreateMap<PlatformReadDto, PlatformPublishedDto>();
+
             // Update DTO to Source
             //CreateMap<PlatformUpdateDto, Platform>();
 
