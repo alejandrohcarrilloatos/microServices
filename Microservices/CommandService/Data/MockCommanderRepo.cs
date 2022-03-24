@@ -25,6 +25,11 @@ namespace CommandService.Data
             throw new System.NotImplementedException();
         }
 
+        public bool ExternalPlatformExists(int externalPlatformId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public IEnumerable<Command> GetAllCommands()
         {
             var commands = new List<Command> {

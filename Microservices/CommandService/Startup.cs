@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using CommandService.EventProcesing;
+using CommandService.AsyncDataServices;
 //using PlatformService.SyncDataServices.Http;
 
 namespace CommandService
@@ -47,6 +49,10 @@ namespace CommandService
                 AddNewtonsoftJson( s => {
                     s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     });
+
+            services.AddHostedService<MessageBusSubscriber>();
+
+            services.AddSingleton<IEventProcessor, EventProcessor>();
 
             // Configuramos el automapeo de los DTOS
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
